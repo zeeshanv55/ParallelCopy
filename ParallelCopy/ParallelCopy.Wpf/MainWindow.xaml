@@ -1,0 +1,127 @@
+﻿<Window x:Class="ParallelCopy.Wpf.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ParallelCopy"
+        xmlns:wpf="clr-namespace:ParallelCopy.Wpf"
+        mc:Ignorable="d"
+        Loaded="MainWindow_OnLoaded"
+        Closed="MainWindow_OnClosed"
+        WindowStyle="None"
+        ResizeMode="CanResizeWithGrip"
+        WindowStartupLocation="Manual"
+        AllowsTransparency="True"
+        MouseEnter="Window_MouseEnter"
+        MouseLeave="Window_MouseLeave"
+        BorderThickness="0"
+        Opacity="0.25"
+        Title="MainWindow" Height="500" Width="400">
+
+    <Window.Background>
+        <SolidColorBrush Color="#DDDDDD"/>
+    </Window.Background>
+
+    <Window.Resources>
+        <wpf:ClipboardTypeToStringConverter x:Key="ClipboardTypeToStringConverter" />
+
+        <Style x:Key="TextBlockContentTypeStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#000000" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="LineHeight" Value="20"/>
+            <Setter Property="Margin" Value="0,0,0,0" />
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        </Style>
+
+        <Style x:Key="DockPanelContentTypeStyle" TargetType="DockPanel">
+            <Setter Property="Margin" Value="20,5,20,0" />
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        </Style>
+        
+        <Style x:Key="TextBlockDescriptionStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#444444" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="LineHeight" Value="15"/>
+            <Setter Property="MaxHeight" Value="15"/>
+            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+            <Setter Property="Margin" Value="20,0,20,0" />
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        </Style>
+        
+        <Style x:Key="StackPanelItemStyle" TargetType="StackPanel">
+            <Setter Property="Margin" Value="0,0,0,0"/>
+            <Setter Property="Orientation" Value="Vertical"/>
+            <Setter Property="MaxWidth" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Path=ActualWidth}"/>
+        </Style>
+        
+        <Style x:Key="ListViewStyle" TargetType="ListView">
+            <Setter Property="Margin" Value="0,0,0,0"/>
+            <Setter Property="Padding" Value="0,0,0,0"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Hidden"/>
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Hidden"/>
+            <Setter Property="SelectionMode" Value="Single"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+        </Style>
+
+        <Style TargetType="ScrollBar">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+
+    </Window.Resources>
+
+    <Grid>
+
+        <StackPanel Orientation="Vertical">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button x:Name="ButtonSettings" Width="40" Height="40" BorderThickness="0">
+                    <Image Source="Images/icon_settings.png" Margin="5,5,5,5"/>
+                </Button>
+                <Button x:Name="ButtonClose" Width="40" Height="40" BorderThickness="0" Click="ButtonClose_OnClick">
+                    <Image Source="Images/icon_x.png" Margin="5,5,5,5"/>
+                </Button>
+            </StackPanel>
+            <ListView x:Name="ListViewClipboardItems" Style="{StaticResource ListViewStyle}" SelectionChanged="ListViewClipboardItems_OnSelectionChanged">
+                <ListView.Resources>
+                    <ControlTemplate x:Key="ListViewItemNormalTemplate" TargetType="ListViewItem">
+                        <StackPanel x:Name="StackPanelItem" Style="{StaticResource StackPanelItemStyle}">
+                            <DockPanel Style="{StaticResource DockPanelContentTypeStyle}">
+                                <TextBlock x:Name="TextBlockContentType" Style="{StaticResource TextBlockContentTypeStyle}" Text="{Binding Type, Converter={StaticResource ClipboardTypeToStringConverter}}"/>
+                                <Button x:Name="ButtonRemoveItem" Visibility="Collapsed" Width="20" Height="20" DockPanel.Dock="Right" HorizontalAlignment="Right" BorderThickness="0" Background="Transparent" Click="ButtonRemoveItem_OnClick">
+                                    <Image Source="Images/icon_x_black.png"/>
+                                </Button>
+                            </DockPanel>
+                            <TextBlock x:Name="TextBlockDescriptionLine1" Style="{StaticResource TextBlockDescriptionStyle}" Text="{Binding Description1}"/>
+                            <TextBlock x:Name="TextBlockDescriptionLine2" Style="{StaticResource TextBlockDescriptionStyle}" Text="{Binding Description2}"/>
+                            <Rectangle Height="1" Fill="Black" HorizontalAlignment="Stretch" Margin="20,10,20,0"/>
+                        </StackPanel>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" TargetName="StackPanelItem" Value="#CCCCCC" />
+                                <Setter TargetName="ButtonRemoveItem" Property="Visibility" Value="Visible"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" TargetName="StackPanelItem" Value="#999999" />
+                                <Setter TargetName="ButtonRemoveItem" Property="Visibility" Value="Collapsed"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                    <Style x:Key="ListViewItemNormalStyle" TargetType="ListViewItem">
+                        <Setter Property="Margin" Value="0,0,0,0"/>
+                        <Setter Property="Padding" Value="10,5,0,0"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                        <Setter Property="Template" Value="{StaticResource ListViewItemNormalTemplate}"/>
+                    </Style>
+                </ListView.Resources>
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem" BasedOn="{StaticResource ListViewItemNormalStyle}">
+                    </Style>
+                </ListView.ItemContainerStyle>
+            </ListView>
+        </StackPanel>
+        
+    </Grid>
+</Window>
